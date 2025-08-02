@@ -1,49 +1,46 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_BASE } from "../config";
 
 function Login() {
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post(`${API_BASE}/api/auth/login`, {
+        username,
+        password,
+      });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Dummy check
-    if (form.username === "admin" && form.password === "admin123") {
-      localStorage.setItem("token", "admin-token"); // dummy token
-      navigate("/");
-    } else {
+      localStorage.setItem("token", res.data.token);
+      alert("Login successful");
+      navigate("/dashboard");
+    } catch (err) {
       alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-80 space-y-4">
-        <h2 className="text-xl font-bold text-center">Admin Login</h2>
-        <input
-          type="text"
-          name="username"
-          value={form.username}
-          onChange={handleChange}
-          placeholder="Username"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          placeholder="Password"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">Login</button>
-      </form>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Admin Login</h2>
+      <input
+        type="text"
+        placeholder="Username"
+        className="border p-2 block mb-2"
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        className="border p-2 block mb-2"
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded">
+        Login
+      </button>
     </div>
   );
 }
